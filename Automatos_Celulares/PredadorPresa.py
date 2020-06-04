@@ -1,9 +1,11 @@
 import random
 import sys
 import copy
+
 random.seed(None)
 
-#CLASSE NÓ
+
+# CLASSE NÓ
 # Cada nó é formado por:
 #   Um indivíduo de uma espécie, que pode ser:
 #       - 1 = Predador
@@ -12,20 +14,20 @@ random.seed(None)
 #   A quantidade de vida desse indivíduo
 #   A posição (x, y) deste nó no tabuleiro
 class No:
-
     especie = None
     x = None
     y = None
     vida = None
 
     def __init__(self, espec=None):
+        print(espec)
         if espec is not None:
             self.especie = espec
         else:
             self.especie = 0
         self.x = None
         self.y = None
-        self.vida = self.especie*2
+        self.vida = self.especie * 2
 
     # Define a localização deste Nó no mapa
     def set_localizacao(self, pos_x, pos_y):
@@ -36,11 +38,11 @@ class No:
     def set_especie(self, num):
         if num == 0 or num == 1 or num == 2:
             self.especie = num
-            if num is 0:  # Nada
+            if num == 0:  # Nada
                 self.vida = None
-            if num is 1:  # Predador
+            if num == 1:  # Predador
                 self.vida = 2
-            if num is 2:  # Presa
+            if num == 2:  # Presa
                 self.vida = 4
         else:
             sys.stderr.write('A espécie não está correta, não faça contas com ela.')
@@ -50,11 +52,11 @@ class No:
     def mover_aqui(self, especie, vida):
         if especie == 0 or especie == 1 or especie == 2:
             self.especie = especie
-            if especie is 0:  # Nada
+            if especie == 0:  # Nada
                 self.vida = vida
-            if especie is 1:  # Predador
+            if especie == 1:  # Predador
                 self.vida = vida
-            if especie is 2:  # Presa
+            if especie == 2:  # Presa
                 self.vida = vida
         else:
             sys.stderr.write('A espécie não está correta, não faça contas com ela.')
@@ -71,21 +73,22 @@ class No:
         self.especie = 2
         self.vida = 1
 
-#CLASSE MAPA
+
+# CLASSE MAPA
 # Representa o mapa onde acontecerá a simulação
 # O mapa é representado por um tabuleiro de células de tamanho (altura x largura)
 class Mapa:
-    altura = 100
-    largura = 100
     tabuleiro = []
 
     # Construtor da classe
     # Ao criar um novo mapa, o prenchemos aleatoriamente
-    def __init__(self):
+    def __init__(self, a, l):
+        self.largura = l
+        self.altura = a
         presas = 0
         predadores = 0
         vazios = 0
-        #Preenche cada célula do tabuleiro aleatoriamente entre Predador(1), Presa(2) ou espaço vazio(0)
+        # Preenche cada célula do tabuleiro aleatoriamente entre Predador(1), Presa(2) ou espaço vazio(0)
         for x in range(self.largura):
             linha = []
             for y in range(self.altura):
@@ -154,31 +157,31 @@ class Mapa:
     #            -Sua vida aumentará com a quantidade de vida que a presa consumida tinha
     def verifica_vizinhos(self, x, y, no):
         # Se o nó estiver vazio, nenhuma verificação será realizada
-        if no.especie is 0:
+        if no.especie == 0:
             return
 
-        if no.especie is 1:
+        if no.especie == 1:
             # Este nó um predador. Procura presas, se não houver presa reduzir a saúde ou morrer
             vizinhos = self.get_vizinhos(x, y)
             presas = []
             vazios_ = []
 
             for viz in vizinhos:
-                if viz.especie is 2:
+                if viz.especie == 2:
                     presas.append(viz)
-                if viz.especie is 0:
+                if viz.especie == 0:
                     vazios_.append(viz)
             tam_vazios = len(vazios_)
 
-            if len(presas) is 0:
+            if len(presas) == 0:
                 if no.vida > 0 and tam_vazios > 0:
                     no.vida -= 1
-                    vazios_[random.randint(0, (tam_vazios-1))].mover_aqui(1, no.vida)
+                    vazios_[random.randint(0, (tam_vazios - 1))].mover_aqui(1, no.vida)
                     no.set_especie(0)
                     return
 
             else:
-                alvo = presas[random.randint(0, (len(presas)-1))]
+                alvo = presas[random.randint(0, (len(presas) - 1))]
                 if no.vida >= alvo.vida:
                     alvo.presa_comida()
 
@@ -186,21 +189,21 @@ class Mapa:
                 no.especie = 0
                 return
 
-        if no.especie is 2:
+        if no.especie == 2:
             # Este nó tem uma presa. Verifica se há superpopulação e a altera a saúde
             vizinhos = self.get_vizinhos(x, y)
             espacos_vazios = []
             for viz in vizinhos:
-                if viz.especie is 0:
+                if viz.especie == 0:
                     espacos_vazios.append(viz)
             cont = len(espacos_vazios)
             if cont >= 7 or cont < 1:
                 no.vida -= 2
-            if no.vida is None or no.vida is 0:
+            if no.vida == None or no.vida == 0:
                 no.especie = 0
                 return
             if no.vida > 6 and len(espacos_vazios) >= 1:
-                espacos_vazios[random.randint(0, (len(espacos_vazios))-1)].presa_reproduz()
+                espacos_vazios[random.randint(0, (len(espacos_vazios)) - 1)].presa_reproduz()
                 no.vida = 4
                 return
             no.vida += 1

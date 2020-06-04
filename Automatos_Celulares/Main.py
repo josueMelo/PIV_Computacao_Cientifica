@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import random
 import sys
 import copy
-import Simulacao as sim
+from Automatos_Celulares import Simulacao as sim
 #random.seed(None)
 
 print("PI V - CIÊNCIA DA COMPUTAÇÃO - SENAC - SIMULAÇÃO DE AUTOMATOS CELULARES", "\n"
